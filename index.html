@@ -1,0 +1,606 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Headers Checker</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <div class="logo">SECURITY <span>HEADERS</span> CHECKER</div>
+
+        <button
+          class="navbar-toggler mx-3"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse ms-5" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#home">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#contact">Contact</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Home Section -->
+    <div id="home" class="container text-center">
+      <h1 class="mb-4">CHECK YOUR WEBSITE</h1>
+      <div class="header-check mb-3">
+        <input
+          type="url"
+          id="url"
+          class="form-control fs-3"
+          placeholder="Enter website URL"
+          required
+        />
+        <button
+          class="btn btn-primary mt-5 w-md-50 md-w-15 fs-3"
+          onclick="checkHeaders()"
+        >
+          Check Headers
+        </button>
+      </div>
+
+      <div id="report">
+        <!-- Patient report section will be dynamically inserted here -->
+      </div>
+
+      <div id="scoreSection" style="display: none">
+        <div class="scoreboard">
+          <div id="presentScore" class="score present">0%</div>
+          <div id="missingScore" class="score missing">0%</div>
+        </div>
+        <div class="score-box">
+          <div class="grade-box" id="gradeBox">Grade: -</div>
+        </div>
+      </div>
+    </div>
+  
+
+
+ 
+<!--csv section -->
+<!-- Add this inside the Home Section -->
+<div class="csv mt-5">
+  <div class="csv-upload mb-3 w-50 ">
+    <label for="csvFileInput">Choose CSV File</label>
+    <input type="file" id="csvFileInput" accept=".csv" class="form-control fs-3" />
+    <button class="btn btn-secondary mt-3 w-md-50 md-w-15 fs-3" onclick="processCSV()">Process CSV</button>
+    <button id="downloadCsvButton" class="btn btn-success mt-3 w-md-50 md-w-15 fs-3" style="display: none;" onclick="downloadCSV()">Download CSV</button>
+  </div>
+  
+</div>
+
+
+
+<!-- Add this inside the Home Section -->
+<div id="fixes-section" style="display: none;">
+  <h3>How to Fix Missing Headers</h3>
+  <div id="fixes-container"></div>
+</div>
+
+
+
+    <!-- fix Section -->
+    <div class="header-container my-5 w-auto">
+      <h2 class="container my-5 text-center">
+        Fixing Procces of Important HTTP Security Headers!
+      </h2>
+
+      <div class="box">
+        <div class="box-header">
+          <span>X-XSS-Protection</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> This header enables the XSS filter in
+            modern browsers to protect against cross-site scripting attacks.For
+            Apache, it is recommended to use the protection provided by XSS
+            filters without the associated risks by using the following code to
+            .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set X-XSS-Protection "1; mode=block"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code>add_header X-XSS-Protection "1; mode=block";</code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>Strict Transport Security (HSTS)</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> Enforces HTTPS connections to prevent
+            attackers from downgrading connections to HTTP.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header always set Strict-Transport-Security "max-age=31536000;
+            includeSubDomains; preload"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p><strong>Nginx:</strong></p>
+          <code
+            >add_header Strict-Transport-Security "max-age=31536000;
+            includeSubDomains; preload";</code
+          >
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>X-Content-Type-Options</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> Prevents MIME-sniffing attacks by
+            forcing the browser to honor the declared Content-Type.For Apache,
+            add the X-Content-Type-Options header with a value of nosniff to
+            inform the browser to trust what the site has sent is the
+            appropriate content-type, and to not attempt “sniffing” the real
+            content-type. Add the following code to the .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set X-Content-Type-Options nosniff<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code>add_header X-Content-Type-Options nosniff;</code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>Content Security Policy (CSP)</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> The Content Security Policy (CSP)
+            header instructs the browser on which resources (scripts, images,
+            styles, etc.) can be loaded from which sources. It helps mitigate
+            XSS and other injection attacks. Add the following code to the
+            .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set Content-Security-Policy "default-src 'self'; script-src
+            'self' 'unsafe-inline'; object-src 'none';"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code
+            >add_header Content-Security-Policy "default-src 'self'; script-src
+            'self' 'unsafe-inline'; object-src 'none';";
+          </code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>Referrer-Policy</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> This header controls how much referrer
+            information (like the previous URL) is included with requests. It
+            helps protect user privacy and prevents unnecessary data leaks.Add
+            the following code to the .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set Referrer-Policy "no-referrer"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code>add_header Referrer-Policy "no-referrer";</code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>Permissions-Policy</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> The Permissions-Policy header allows
+            you to control which browser features (e.g., geolocation, camera)
+            are enabled or disabled.Add the following code to the .htaccess
+            file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set Permissions-Policy "geolocation=(), microphone=(),
+            camera=()"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code
+            >add_header Permissions-Policy "geolocation=(), microphone=(),
+            camera=()";
+          </code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>X-Frame-Options</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> The X-Frame-Options header protects
+            against "Clickjacking" attacks by controlling whether a page can be
+            embedded in an iframe.Add the following code to the .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set X-Frame-Options "DENY"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code>add_header X-Frame-Options "DENY"; </code>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <span>Expect-CT</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="box-content">
+          <p>
+            <strong>Description:</strong> The Expect-CT header helps enforce
+            Certificate Transparency to detect misissued SSL/TLS
+            certificates.Add the following code to the .htaccess file.
+          </p>
+          <p><strong>Apache:</strong></p>
+          <code>
+            &lt;IfModule mod_headers.c&gt;<br />
+            Header set Expect-CT "max-age=86400, enforce"<br />
+            &lt;/IfModule&gt;
+          </code>
+          <p>
+            For Nginx, add the following code to the nginx configuration.<strong
+              >Nginx:</strong
+            >
+          </p>
+          <code>add_header Expect-CT "max-age=86400, enforce"; </code>
+        </div>
+      </div>
+    </div>
+
+  <!-- realtime solution module --> 
+  <button id="real-time-solution-btn" style="display: none;" onclick="fetchRealTimeSolution()">Get Real-Time Solution</button>
+        <div id="real-time-solution" class="solution" style="display: none;">
+            <h2>Real-Time Solution</h2>
+            <p id="gemini-response">Loading...</p>
+        </div>
+
+        
+    <!--importance section -->
+    <div class="container my-5">
+      <h1 class="text-center mb-4">HTTP Security Headers Summary</h1>
+      <div class="table-responsive ">
+        <table class="table  table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">Header</th>
+              <th scope="col">protection Against</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="badge badge-success">Content-Security-Policy</span>
+              </td>
+              <td>Prevents XSS and code injection attacks</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge badge-success"
+                  >Strict-Transport-Security</span
+                >
+              </td>
+              <td>Protocol downgrade, MITM attacks</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge badge-warning">X-Content-Type-Options</span>
+              </td>
+              <td>Prevents MIME-sniffing attacks</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-warning">X-Frame-Options</span></td>
+              <td>Protects against Clickjacking</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-warning">X-XSS-Protection</span></td>
+              <td>XSS attacks</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-danger">Referrer-Policy</span></td>
+              <td>Controls referrer information to prevent data leakage</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge badge-danger">Cross-Origin-Opener-Policy</span>
+              </td>
+              <td>Cross-origin attacks</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge badge-danger">Permissions-Policy</span>
+              </td>
+              <td>Controls browser features like geolocation and camera</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-danger">Set-Cookie Attributes</span></td>
+              <td>Session hijacking, CSRF attacks</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Without http security headers a website can be secured-->
+    <div class="container my-5">
+      <!-- Section Title -->
+      <h1 class="section-title">How Websites Are Secured Without HTTP Headers!</h1>
+      <p class="container section-description">
+        However, HTTP security headers remain a best practice and should be implemented to provide defense in depth and ensure compliance with modern security standards.
+
+        If you're working on securing a website, it's highly recommended to use HTTP security headers alongside these other measures for comprehensive protection.
+        
+        While HTTP security headers are important, many organizations use alternative methods to secure their websites. Here's how they do it:
+      </p>
+
+      <!-- Cards Section -->
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          <!-- Card 1: Web Application Firewalls (WAFs) -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">Web Application Firewalls (WAFs)</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Filters and monitors HTTP traffic to block malicious requests.</li>
+                          <li>Prevents SQL injection, XSS, and DDoS attacks.</li>
+                          <li>Example: Cloudflare, AWS WAF.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Card 2: Secure Coding Practices -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">Secure Coding Practices</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Input validation and output encoding to prevent vulnerabilities.</li>
+                          <li>Use of parameterized queries to avoid SQL injection.</li>
+                          <li>Regular code reviews and security testing.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Card 3: Regular Security Audits -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">Regular Security Audits</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Conduct penetration testing to identify vulnerabilities.</li>
+                          <li>Hire third-party firms for security assessments.</li>
+                          <li>Fix vulnerabilities before they are exploited.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Card 4: HTTPS (SSL/TLS Encryption) -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">HTTPS (SSL/TLS Encryption)</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Encrypts data between the client and server.</li>
+                          <li>Prevents eavesdropping and MITM attacks.</li>
+                          <li>Example: SSL/TLS certificates from trusted CAs.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Card 5: Rate Limiting and DDoS Protection -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">Rate Limiting and DDoS Protection</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Restricts the number of requests per user.</li>
+                          <li>Mitigates brute force and DDoS attacks.</li>
+                          <li>Example: Cloudflare DDoS protection.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Card 6: Content Delivery Networks (CDNs) -->
+          <div class="col">
+              <div class="card h-100">
+                  <div class="card-header">Content Delivery Networks (CDNs)</div>
+                  <div class="card-body">
+                      <ul>
+                          <li>Distributes content across multiple servers.</li>
+                          <li>Provides built-in security features like DDoS protection.</li>
+                          <li>Example: Cloudflare, Akamai.</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Call to Action -->
+      <div class="text-center mt-5">
+          <h2 class="mb-3 text-center ">Want to check your website's HTTP security headers?</h2>
+          <a href="#home" class="btn btn-custom">Check Headers Now</a>
+      </div>
+  </div>
+
+
+    <!-- About Section -->
+    <div id="about" class="about-section">
+      <h2>About Us</h2>
+      <div class="contaoner">
+        <h3>Who?</h3>
+        <p class="container">
+          Security Headers is a tool originally created by Scott Helme and is
+          now part of Probely. It is free to use and designed to help website
+          owners and developers understand and set up modern security features
+          to protect their websites better. The tool makes it simple to identify
+          and implement important security headers, which are critical for
+          improving the overall safety of a website. Probely, the company behind
+          Security Headers, is a leading name in the cybersecurity field. They
+          specialize in finding vulnerabilities in web applications and APIs
+          using their Dynamic Application Security Testing (DAST) tools. These
+          tools are designed to scan websites and APIs for weaknesses that
+          hackers might exploit, allowing developers to fix issues before they
+          become a problem. Probely’s focus is on providing user-friendly
+          solutions to improve the security of online platforms.
+        </p>
+      </div>
+      <div class="container">
+        <h3>Why?</h3>
+        <p class="container">
+          "There are services that analyze the HTTP response headers of
+          websites, and we also offer a grading system for the results. These
+          headers provide important security, and it’s crucial for websites to
+          use them. By making it easy to check for missing headers and offering
+          guidance on how to add them, we aim to encourage more websites to
+          improve their security."
+        </p>
+      </div>
+      <div class="container">
+        <h3>OUR GOAL</h3>
+        <p class="container">
+          At SecurityHeaders.com, we aim to provide website administrators and
+          developers with a simple tool to check the security headers of any
+          website. By using a wide array of security headers, we help protect
+          your site from common security threats such as clickjacking,
+          cross-site scripting, and data theft. With our checker, you can easily
+          identify missing headers that may leave your website vulnerable and
+          take steps to correct them.
+        </p>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="contact-section">
+      <h2>Contact Us</h2>
+      <p class="container">
+        Have any questions or need support? We're here to help. Feel free to get
+        in touch with us through the form below.
+      </p>
+      <div class="container">
+        <form action="https://formspree.io/f/xkgnbdjk" method="POST">
+          <label class="container">
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter Your Email"
+              required
+            />
+          </label>
+          <label class="container">
+            <textarea
+              name="message"
+              placeholder="Your Message"
+              rows="4"
+              required
+            ></textarea>
+          </label>
+          <!-- your other form fields go here -->
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2024 Security Headers Checker. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/index.js"></script>
+  </body>
+</html>
