@@ -5,10 +5,10 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 const savetoDB = require('./controller/portal.controller.js');const multer = require('multer'); // For handling file uploads
-const csv = require('csv-parser'); // For parsing CSV files
-const fs = require('fs'); // For file system operations
+const csv = require('csv-parser'); //This part is  For parsing CSV files
+const fs = require('fs'); //This part is  For file system operations
 
-// Expanded list of security headers to check
+// exect list  of security headers to check
 const securityHeaders = [
     "Content-Security-Policy",
     "Strict-Transport-Security",
@@ -18,11 +18,12 @@ const securityHeaders = [
     "Referrer-Policy",
     "Cross-Origin-Opener-Policy",
     "Permissions-Policy",
-    "Set-Cookie Attributes",
-    "Cache-Control"
+    "Expect-CT",
+    "Cross-Origin-Embedder-Policy",
+    "Cross-Origin-Resource-Policy"
 ];
 
-// Connect to MongoDB
+// This part is for Connect to MongoDB
 try {
     mongoose.connect('mongodb://localhost:27017/Project', {
         useNewUrlParser: true,
@@ -34,16 +35,16 @@ try {
     console.error("Database connection failed", error);
 }
 
-// Middleware to parse JSON request body
+//This is my Middleware funtion that part to parse JSON request body
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
 const upload = multer({ dest: 'uploads/' }); // Files will be temporarily stored in the 'uploads/' folder
-// Serve the frontend
+// This is the funtion that Serve the frontend
 app.get("/api", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Endpoint to check security headers
+// This is my Endpoint to check security headers
 app.post('/api/headers', async (req, res) => {
     const { url } = req.body;
 
@@ -52,7 +53,7 @@ app.post('/api/headers', async (req, res) => {
     }
 
     try {
-        // Perform a HEAD request to fetch headers
+        // here this part  Perform a HEAD request to fetch headers
         const response = await axios.head(url, { validateStatus: () => true });
 
         // Prepare the headers report
@@ -148,30 +149,40 @@ app.listen(PORT, () => {
 
 
 
-// Endpoint to check security headers using securityheaders.com
-app.post('/api/check-security-headers', async (req, res) => {
-    const { url } = req.body;
 
-    if (!url) {
-        return res.status(400).json({ error: 'Please provide a valid URL.' });
-    }
 
-    try {
-        // Fetch the security headers report from securityheaders.com
-        const response = await axios.get(`https://securityheaders.com/?q=${url}&followRedirects=on`);
 
-        // Extract the grade and other details from the response
-        const grade = response.data.match(/<span class="grade-[A-F]">([A-F])<\/span>/)?.[1] || 'N/A';
-        const report = response.data.match(/<div class="report">([\s\S]*?)<\/div>/)?.[1] || 'No report available.';
 
-        // Return the grade and report
-        return res.json({ url, grade, report });
-    } catch (error) {
-        console.error('Error fetching security headers:', error.message);
-        return res.status(500).json({ error: 'Failed to fetch security headers.' });
-    }
+
+// Endpoint to call DeepSeek API
+app.post('/api/deepseek', async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required.' });
+  }
+
+  try {
+    const deepseekResponse = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'deepseek/deepseek-r1:free',
+        messages: [{ role: 'user', content: message }],
+      },
+      {
+        headers: {
+          Authorization: 'Bearer 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', // Replace with your DeepSeek API key
+          'HTTP-Referer': 'https://www.webstylepress.com',
+          'X-Title': 'WebStylePress',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const responseText = deepseekResponse.data.choices[0].message.content;
+    res.json({ response: responseText });
+  } catch (error) {
+    console.error('Error calling DeepSeek API:', error.message);
+    res.status(500).json({ error: 'Failed to call DeepSeek API.' });
+  }
 });
-
-
-
-

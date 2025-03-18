@@ -13,9 +13,8 @@ async function checkHeaders() {
         "Content-Security-Policy",
         "X-Content-Type-Options",
         "Referrer-Policy",
-        "Permissions-Policy",
-        "X-XSS-Protection",
-        "Cache-Control"
+        "X-XSS-Protection"
+        
     ];
 
     // Clear previous results
@@ -231,4 +230,62 @@ function checkSecurityHeaders() {
 
 
 
+// Function to fetch real-time solutions from DeepSeek API
+async function fetchRealTimeSolution() {
+  const url = document.getElementById('url').value;
+  const responseDiv = document.getElementById('deepseek-response');
+  responseDiv.innerHTML = 'Loading...';
 
+  if (!url) {
+    alert('Please enter a valid URL first.');
+    return;
+  }
+
+  try {
+    // Step 1: Fetch headers for the URL
+    const headersResponse = await fetch('/api/headers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+
+    const headersData = await headersResponse.json();
+
+    // Step 2: Identify missing headers
+    const missingHeaders = Object.entries(headersData.headers)
+      .filter(([header, status]) => status === "missing")
+      .map(([header]) => header);
+
+    if (missingHeaders.length === 0) {
+      responseDiv.innerHTML = '<div class="alert alert-success">All security headers are present!</div>';
+      return;
+    }
+
+    // Step 3: Construct the message for DeepSeek API
+    const message = `How can I fix missing security headers? Here is the list of missing HTTP security headers: ${missingHeaders.join(', ')}`;
+
+    // Step 4: Call DeepSeek API via your backend
+    const deepseekResponse = await fetch('/api/deepseek', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    const deepseekData = await deepseekResponse.json();
+
+    // Step 5: Format and display the solution
+    const solutionText = deepseekData.response;
+    const formattedSolution = `
+      <div class="solution-card">
+        <h3>Solution for Missing Headers</h3>
+        <p>Here are the steps to fix the missing security headers:</p>
+        <div>${marked.parse(solutionText)}</div>
+      </div>
+    `;
+
+    responseDiv.innerHTML = formattedSolution;
+  } catch (error) {
+    console.error('Error:', error);
+    responseDiv.innerHTML = '<div class="alert alert-danger">Failed to fetch real-time solution. Please try again.</div>';
+  }
+}
