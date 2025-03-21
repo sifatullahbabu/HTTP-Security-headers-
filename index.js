@@ -36,6 +36,7 @@ mongoose.connect('mongodb://sifat0162:sifatlamiya@cluster-0-shard-00-00.9ggdq.mo
     });
 
 // Middleware to parse JSON request body
+app.use(helmet()); // Use helmet first
 app.use(express.json());
 
 // Serve static files from the "public" directory
