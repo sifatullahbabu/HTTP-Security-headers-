@@ -4,11 +4,12 @@ const axios = require('axios');
 const path = require('path');
 const app = express();
 const PORT = 3000;
-const savetoDB = require('./controller/portal.controller.js');const multer = require('multer'); // For handling file uploads
-const csv = require('csv-parser'); //This part is  For parsing CSV files
-const fs = require('fs'); //This part is  For file system operations
+const savetoDB = require('./controller/portal.controller.js');
+const multer = require('multer'); // For handling file uploads
+const csv = require('csv-parser'); // For parsing CSV files
+const fs = require('fs'); // For file system operations
 
-// exect list  of security headers to check
+// List of security headers to check
 const securityHeaders = [
     "Content-Security-Policy",
     "Strict-Transport-Security",
@@ -23,27 +24,42 @@ const securityHeaders = [
     "Cross-Origin-Resource-Policy"
 ];
 
-// This part is for Connect to MongoDB
-try {mongodb+
-    mongoose.connect('mongodb://sifat0162:<sifatlamiya>@cluster-0-shard-00-00.9ggdq.mongodb.net:27017,cluster-0-shard-00-01.9ggdq.mongodb.net:27017,cluster-0-shard-00-02.9ggdq.mongodb.net:27017/?replicaSet=atlas-ampeh7-shard-0&ssl=true&authSource=admin&retryWrites=true&w=majority&appName=Cluster-0', {
-       
-    }).then(() => {
+// Connect to MongoDB
+mongoose.connect('mongodb://sifat0162:sifatlamiya@cluster-0-shard-00-00.9ggdq.mongodb.net:27017,cluster-0-shard-00-01.9ggdq.mongodb.net:27017,cluster-0-shard-00-02.9ggdq.mongodb.net:27017/?replicaSet=atlas-ampeh7-shard-0&ssl=true&authSource=admin&retryWrites=true&w=majority&appName=Cluster-0')
+    .then(() => {
         console.log("Database connected");
+    })
+    .catch((error) => {
+        console.error("Database connection failed", error);
     });
-} catch (error) {
-    console.error("Database connection failed", error);
-}
 
-//This is my Middleware funtion that part to parse JSON request body
+// Middleware to parse JSON request body
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "/public")));
-const upload = multer({ dest: 'uploads/' }); // Files will be temporarily stored in the 'uploads/' folder
-// This is the funtion that Serve the frontend
-app.get("/api", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, "public")));
+
+// Debugging: Log static file serving
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.url}`);
+    next();
 });
 
-// This is my Endpoint to check security headers
+const upload = multer({ dest: 'uploads/' }); // Files will be temporarily stored in the 'uploads/' folder
+
+// Serve the frontend (index.html) for the root route
+app.get("/", (req, res) => {
+    console.log("Serving index.html"); // Debugging log
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// GET route for /api
+app.get("/api", (req, res) => {
+    console.log("API route accessed"); // Debugging log
+    res.json({ message: "Welcome to the API!" });
+});
+
+// Endpoint to check security headers
 app.post('/api/headers', async (req, res) => {
     const { url } = req.body;
 
@@ -52,7 +68,7 @@ app.post('/api/headers', async (req, res) => {
     }
 
     try {
-        // here this part  Perform a HEAD request to fetch headers
+        // Perform a HEAD request to fetch headers
         const response = await axios.head(url, { validateStatus: () => true });
 
         // Prepare the headers report
@@ -72,22 +88,8 @@ app.post('/api/headers', async (req, res) => {
     }
 });
 
-
-
-
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-
-
-
-
-
-  // Read and process the uploaded CSV file
-  app.post('/api/upload-csv', upload.single('csvFile'), async (req, res) => {
+// Read and process the uploaded CSV file
+app.post('/api/upload-csv', upload.single('csvFile'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No CSV file uploaded.' });
     }
@@ -140,42 +142,40 @@ app.listen(PORT, () => {
         });
 });
 
-
-
-
-
-
-
-
 // Endpoint to call DeepSeek API
 app.post('/api/deepseek', async (req, res) => {
-  const { message } = req.body;
+    const { message } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: 'Message is required.' });
-  }
+    if (!message) {
+        return res.status(400).json({ error: 'Message is required.' });
+    }
 
-  try {
-    const deepseekResponse = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        model: 'deepseek/deepseek-r1:free',
-        messages: [{ role: 'user', content: message }],
-      },
-      {
-        headers: {
-          Authorization: 'Bearer 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', // Replace with your DeepSeek API key
-          'HTTP-Referer': 'https://www.webstylepress.com',
-          'X-Title': 'WebStylePress',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    try {
+        const deepseekResponse = await axios.post(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+                model: 'deepseek/deepseek-r1:free',
+                messages: [{ role: 'user', content: message }],
+            },
+            {
+                headers: {
+                    Authorization: 'Bearer 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', // Replace with your DeepSeek API key
+                    'HTTP-Referer': 'https://www.webstylepress.com',
+                    'X-Title': 'WebStylePress',
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
-    const responseText = deepseekResponse.data.choices[0].message.content;
-    res.json({ response: responseText });
-  } catch (error) {
-    console.error('Error calling DeepSeek API:', error.message);
-    res.status(500).json({ error: 'Failed to call DeepSeek API.' });
-  }
+        const responseText = deepseekResponse.data.choices[0].message.content;
+        res.json({ response: responseText });
+    } catch (error) {
+        console.error('Error calling DeepSeek API:', error.message);
+        res.status(500).json({ error: 'Failed to call DeepSeek API.' });
+    }
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
