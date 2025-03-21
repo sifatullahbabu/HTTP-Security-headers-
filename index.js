@@ -159,7 +159,7 @@ app.post('/api/deepseek', async (req, res) => {
             },
             {
                 headers: {
-                    Authorization: 'Bearer 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', // Replace with your DeepSeek API key
+                    Authorization: 'Bearer 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', // Replace with your DeepSeek API key
                     'HTTP-Referer': 'https://www.webstylepress.com',
                     'X-Title': 'WebStylePress',
                     'Content-Type': 'application/json',
