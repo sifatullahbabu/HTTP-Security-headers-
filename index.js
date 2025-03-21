@@ -8,6 +8,7 @@ const savetoDB = require('./controller/portal.controller.js');
 const multer = require('multer'); // For handling file uploads
 const csv = require('csv-parser'); // For parsing CSV files
 const fs = require('fs'); // For file system operations
+require('dotenv').config();
 
 // List of security headers to check
 const securityHeaders = [
@@ -159,7 +160,7 @@ app.post('/api/deepseek', async (req, res) => {
             },
             {
                 headers: {
-                    Authorization: 'Bearer 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', // Replace with your DeepSeek API key
+                  Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`, // Use environment variable for API key
                     'HTTP-Referer': 'https://www.webstylepress.com',
                     'X-Title': 'WebStylePress',
                     'Content-Type': 'application/json',
