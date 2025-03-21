@@ -9,6 +9,7 @@ const multer = require('multer'); // For handling file uploads
 const csv = require('csv-parser'); // For parsing CSV files
 const fs = require('fs'); // For file system operations
 require('dotenv').config();
+const helmet = require('helmet'); // Import helmet
 
 // List of security headers to check
 const securityHeaders = [
