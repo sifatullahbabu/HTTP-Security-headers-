@@ -26,8 +26,7 @@ const securityHeaders = [
 // This part is for Connect to MongoDB
 try {
     mongoose.connect('mongodb+srv://sifat0162:<sifatlamiya>@cluster-0.9ggdq.mongodb.net/?appName=Cluster-0', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
+       
     }).then(() => {
         console.log("Database connected");
     });
