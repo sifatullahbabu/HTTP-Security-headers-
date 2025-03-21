@@ -36,7 +36,55 @@ mongoose.connect('mongodb://sifat0162:sifatlamiya@cluster-0-shard-00-00.9ggdq.mo
     });
 
 // Middleware to parse JSON request body
-app.use(helmet()); // Use helmet first
+// Customized helmet configuration
+app.use(
+  helmet({
+      // Content Security Policy (CSP)
+      contentSecurityPolicy: {
+          directives: {
+              defaultSrc: ["'self'"], // Allow resources from the same origin
+              scriptSrc: ["'self'"], // Allow scripts from the same origin
+              styleSrc: ["'self'"], // Allow styles from the same origin
+              imgSrc: ["'self'", "data:"], // Allow images from the same origin and data URIs
+              fontSrc: ["'self'", "fonts.gstatic.com"], // Allow fonts from the same origin and Google Fonts
+          },
+      },
+      // Strict-Transport-Security (HSTS)
+      strictTransportSecurity: {
+          maxAge: 31536000, // 1 year in seconds
+          includeSubDomains: true, // Apply to subdomains
+          preload: true, // Allow preloading in browsers
+      },
+      // X-XSS-Protection
+      xXssProtection: { setOnOldIE: true, mode: 'block' }, // Enable XSS protection
+      // X-Frame-Options
+      xFrameOptions: { action: 'sameorigin' }, // Prevent Clickjacking
+      // X-Content-Type-Options
+      xContentTypeOptions: true, // Prevent MIME sniffing
+      // Referrer-Policy
+      referrerPolicy: { policy: 'no-referrer' }, // Control referrer information
+      // Cross-Origin-Opener-Policy
+      crossOriginOpenerPolicy: { policy: 'same-origin' }, // Prevent cross-origin attacks
+      // Permissions-Policy
+      permissionsPolicy: {
+          features: {
+              geolocation: ["'none'"], // Disable geolocation
+              microphone: ["'none'"], // Disable microphone
+              camera: ["'none'"], // Disable camera
+          },
+      },
+      // Expect-CT
+      expectCt: {
+          enforce: true, // Enforce Certificate Transparency
+          maxAge: 86400, // 1 day in seconds
+      },
+      // Cross-Origin-Embedder-Policy
+      crossOriginEmbedderPolicy: { policy: 'require-corp' }, // Prevent cross-origin resource loading
+      // Cross-Origin-Resource-Policy
+      crossOriginResourcePolicy: { policy: 'same-origin' }, // Prevent cross-origin resource embedding
+  })
+);
+
 app.use(express.json());
 
 // Serve static files from the "public" directory
