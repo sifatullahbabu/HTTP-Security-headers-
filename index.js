@@ -25,7 +25,7 @@ const securityHeaders = [
 
 // This part is for Connect to MongoDB
 try {
-    mongoose.connect('mongodb://localhost:27017/Project', {
+    mongoose.connect('mongodb+srv://sifat0162:<sifatlamiya>@cluster-0.9ggdq.mongodb.net/?appName=Cluster-0', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }).then(() => {
@@ -83,13 +83,7 @@ app.listen(PORT, () => {
 });
 
 
-// Add these imports at the top of your file
-//const multer = require('multer'); // For handling file uploads
-//const csv = require('csv-parser'); // For parsing CSV files
-//const fs = require('fs'); // For file system operations
 
-// Add this after your existing middleware setup
-//const upload = multer({ dest: 'uploads/' });
 
 
 
