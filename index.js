@@ -24,8 +24,8 @@ const securityHeaders = [
 ];
 
 // This part is for Connect to MongoDB
-try {
-    mongoose.connect('mongodb+srv://sifat0162:<sifatlamiya>@cluster-0.9ggdq.mongodb.net/?appName=Cluster-0', {
+try {mongodb+
+    mongoose.connect('mongodb://sifat0162:<sifatlamiya>@cluster-0-shard-00-00.9ggdq.mongodb.net:27017,cluster-0-shard-00-01.9ggdq.mongodb.net:27017,cluster-0-shard-00-02.9ggdq.mongodb.net:27017/?replicaSet=atlas-ampeh7-shard-0&ssl=true&authSource=admin&retryWrites=true&w=majority&appName=Cluster-0', {
        
     }).then(() => {
         console.log("Database connected");
