@@ -132,12 +132,15 @@ if (file) {
     const formData = new FormData();
     formData.append('csvFile', file);
 
+    document.getElementById('csvSpinner').style.display = 'block';//show spinner
+
     fetch('/api/upload-csv', {
         method: 'POST',
         body: formData,
     })
         .then(response => response.json())
         .then(data => {
+          document.getElementById('csvSpinner').style.display = 'none';//hide spinner
             if (data.length > 0) {
                 // Convert processed data to CSV format
                 const headers = Object.keys(data[0]).join(','); // CSV headers
@@ -159,6 +162,8 @@ if (file) {
         })
         .catch(error => {
             console.error('Error:', error);
+            document.getElementById('csvSpinner').style.display = 'none';//hide spinner
+
             alert('Failed to process CSV file. Please try again.');
         });
 } else {
