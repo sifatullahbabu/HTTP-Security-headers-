@@ -217,16 +217,24 @@ app.post("/api/upload-csv", upload.single("csvFile"), async (req, res) => {
           })),
         });
         await csvWriter.writeRecords(processedData);
-
-        // ✅ Auto-run ML model after CSV is ready
-        const python = process.platform === "win32" ? "python" : "python3";
+        const path = require("path");
+        const { spawnSync } = require("child_process");
+        
         console.log("⏳ Running ML prediction...");
-
+        
+        // Ensure we're using Python 3
+        const python = "python3";
+        
+        // Define the correct working directory
+        const mlDirectory = path.join(__dirname, "ml"); // Ensure this is where 'predict.py' is located
+        
+        // Run the Python script to generate predictions
         const ml = spawnSync(python, ["predict.py"], {
-          cwd: path.join(__dirname, "ml"),
+          cwd: mlDirectory,  // Set correct working directory
           encoding: "utf-8",
         });
-
+        
+        // Check for errors and log the output or error
         if (ml.error) {
           console.error("❌ ML prediction failed:", ml.error.message);
           return res.status(500).json({ error: "ML prediction failed." });
@@ -235,8 +243,10 @@ app.post("/api/upload-csv", upload.single("csvFile"), async (req, res) => {
           console.error("⚠️ ML stderr:", ml.stderr);
         }
         console.log("✅ ML output:\n", ml.stdout);
-      }
-
+        
+        // You can serve the predictions after this step
+        
+     
       return res.json(processedData);
     })
     .on("error", (error) => {
