@@ -243,10 +243,8 @@ app.post("/api/upload-csv", upload.single("csvFile"), async (req, res) => {
           console.error("⚠️ ML stderr:", ml.stderr);
         }
         console.log("✅ ML output:\n", ml.stdout);
-        
-        // You can serve the predictions after this step
-        
-     
+      }
+        // You can serve the predictions after this step   
       return res.json(processedData);
     })
     .on("error", (error) => {
