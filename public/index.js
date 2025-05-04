@@ -117,7 +117,6 @@ async function streamResponse() {
   }
 }
 
-// Add these functions to your existing JavaScript
 // Function to process the CSV file
 function processCSV() {
   const fileInput = document.getElementById("csvFileInput");
@@ -153,10 +152,10 @@ function processCSV() {
           // Store processed data in a global variable
           window.processedCsvData = csvData;
 
-          // Show the download button
+          // Show the download buttons
           document.getElementById("downloadCsvButton").style.display = "block";
           document.getElementById("downloadPredictionButton").style.display =
-            "block"; // Show prediction button too
+            "block"; // Show prediction button
         } else {
           alert("No valid data found in processed results.");
         }
@@ -198,35 +197,6 @@ function downloadCSV() {
   } else {
     alert("No processed data available to download.");
   }
-}
-
-// Function to check security headers using securityheaders.com
-function checkSecurityHeaders() {
-  const url = document.getElementById("securityUrlInput").value;
-
-  if (!url) {
-    alert("Please enter a valid URL.");
-    return;
-  }
-
-  fetch("/api/check-security-headers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ url }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Display the results
-      document.getElementById("securityGrade").textContent = data.grade;
-      document.getElementById("securityReport").textContent = data.report;
-      document.getElementById("securityHeadersResult").style.display = "block";
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("Failed to fetch security headers. Please try again.");
-    });
 }
 
 // Function to fetch real-time solutions from DeepSeek API
@@ -293,12 +263,15 @@ async function fetchRealTimeSolution() {
   }
 }
 
-// ✅ Function to download predictions_results.csv from server
+// ✅ Function to download predictions_results.csv from the server
 function downloadPredictionCSV() {
   const a = document.createElement("a");
-  a.href = "/download/predictions";
+  a.href = "/download/predictions"; // Assuming /download/predictions will serve predictions_results.csv
   a.download = "predictions_results.csv";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+
+  // Hide the download button after clicking
+  document.getElementById("downloadPredictionButton").style.display = "none";
 }
