@@ -1,0 +1,8 @@
+url,Content-Security-Policy,Strict-Transport-Security,X-XSS-Protection,X-Frame-Options,X-Content-Type-Options,Referrer-Policy,Cross-Origin-Opener-Policy,Permissions-Policy,Expect-CT,Cross-Origin-Embedder-Policy,Cross-Origin-Resource-Policy
+https://www.google.com/,0,0,1,1,0,0,0,0,0,0,0
+https://www.wikipedia.org/,0,1,0,0,0,0,0,0,0,0,0
+https://www.mozilla.org/,1,1,0,1,1,1,1,0,0,0,0
+https://www.youtube.com/,1,1,1,1,1,0,1,1,0,0,0
+https://securityheaders.com/,0,0,0,1,1,1,1,1,0,1,1
+https://www.facebook.com/,1,1,1,1,1,0,1,1,0,0,1
+http://www.animehouse.com/,1,1,1,1,1,0,0,0,0,0,0
