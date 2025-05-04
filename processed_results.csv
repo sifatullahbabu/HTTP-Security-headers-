@@ -3,6 +3,8 @@ https://www.google.com/,0,0,1,1,0,0,0,0,0,0,0
 https://www.wikipedia.org/,0,1,0,0,0,0,0,0,0,0,0
 https://www.mozilla.org/,1,1,0,1,1,1,1,0,0,0,0
 https://www.youtube.com/,1,1,1,1,1,0,1,1,0,0,0
-https://securityheaders.com/,0,0,0,1,1,1,1,1,0,1,1
-https://www.facebook.com/,1,1,1,1,1,0,1,1,0,0,1
-http://www.animehouse.com/,1,1,1,1,1,0,0,0,0,0,0
+https://chatgpt.com/,0,1,0,1,1,1,1,1,0,1,1
+https://mail.google.com/,1,1,1,1,1,0,0,1,0,0,1
+https://colab.research.google.com/,0,0,1,1,1,0,0,0,0,0,0
+https://github.com/,1,1,1,1,1,1,0,0,0,0,0
+https://developer.mozilla.org/,1,1,0,1,1,0,0,0,0,0,0
