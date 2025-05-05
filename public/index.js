@@ -27,7 +27,7 @@ async function checkHeaders() {
   }
 
   try {
-    const response = await fetch("/api/headers", {
+    const response = await fetch("/api/predict-single", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: url }),
@@ -36,6 +36,7 @@ async function checkHeaders() {
     if (response.ok) {
       const data = await response.json();
       const headers = data.headers;
+      const prediction = data.prediction;
       console.log(headers);
       let mainPresentCount = 0;
       let otherPresentCount = 0;
@@ -45,21 +46,32 @@ async function checkHeaders() {
         const status = headers[header];
         const isMainHeader = mainHeaders.includes(header);
 
-        if (status !== "missing") {
+        if (String(status).toUpperCase() !== "MISSING") {
           if (isMainHeader) mainPresentCount++;
           else otherPresentCount++;
         }
 
-        const cardClass = status === "missing" ? "missing" : "present";
+        const cardClass =
+          String(status).toUpperCase() === "MISSING" ? "missing" : "present";
         reportHTML += `
                   <div class="report-card ${cardClass}">
                       <div class="d-flex justify-content-between align-items-center">
                           <h5>${header}</h5>
-                          <span>${status.toUpperCase()}</span>
+                          <span>${String(status).toUpperCase()}</span>
                       </div>
                   </div>
               `;
       });
+
+      // Append prediction
+      reportHTML += `
+        <div class="report-card prediction">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5>ML Prediction</h5>
+            <span>${prediction}</span>
+          </div>
+        </div>
+      `;
 
       reportContainer.innerHTML = reportHTML;
 
@@ -86,7 +98,7 @@ async function checkHeaders() {
 
       scoreSection.style.display = "block";
     } else {
-      alert("Failed to fetch headers. Please try again.");
+      alert("Failed to fetch headers or prediction. Please try again.");
     }
   } catch (error) {
     console.error("Error:", error);
@@ -263,15 +275,25 @@ async function fetchRealTimeSolution() {
   }
 }
 
-// ✅ Function to download predictions_results.csv from the server
-function downloadPredictionCSV() {
-  const a = document.createElement("a");
-  a.href = "/download/predictions"; // Assuming /download/predictions will serve predictions_results.csv
-  a.download = "predictions_results.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+async function downloadPredictionCSV() {
+  try {
+    const response = await fetch("/download/predictions");
+    if (!response.ok) throw new Error("File not found");
 
-  // Hide the download button after clicking
-  document.getElementById("downloadPredictionButton").style.display = "none";
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "predictions_results.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    document.getElementById("downloadPredictionButton").style.display = "none";
+  } catch (error) {
+    console.error("Prediction download failed:", error);
+    alert("Prediction file could not be downloaded.");
+  }
 }

@@ -75,6 +75,14 @@ p {
   font-weight: bold;
   color: #1e3c72;
 }
+.report-card.prediction {
+  border: 2px solid #17a2b8;
+  background-color: #e9f7fd;
+  color: #0c5460;
+  padding: 10px;
+  margin-top: 10px;
+  font-weight: bold;
+}
 
 .report-card {
   border-radius: 10px;
